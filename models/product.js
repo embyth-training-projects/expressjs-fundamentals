@@ -1,22 +1,5 @@
-const fs = require("fs");
-
-const { nanoid } = require("nanoid");
-
-const utils = require("../helpers/utils");
-
 const Cart = require("./cart");
-
-const productsPath = utils.getCombinedPath("products.json", "data");
-
-const getProducts = (callback) => {
-  fs.readFile(productsPath, (err, fileContent) => {
-    if (err) {
-      callback([]);
-    } else {
-      callback(JSON.parse(fileContent));
-    }
-  });
-};
+const db = require("../helpers/database");
 
 module.exports = class Product {
   constructor(id, title, imageUrl, description, price) {
@@ -28,57 +11,28 @@ module.exports = class Product {
   }
 
   save() {
-    getProducts((products) => {
-      if (this.id) {
-        const existingProductIndex = products.findIndex(
-          (product) => product.id === this.id
-        );
+    return db.execute(
+      "INSERT INTO products (title, imageUrl, description, price) VALUES (?, ?, ?, ?)",
+      [this.title, this.imageUrl, this.description, this.price]
+    );
+  }
 
-        const updatedProducts = [
-          ...products.slice(0, existingProductIndex),
-          this,
-          ...products.slice(existingProductIndex + 1),
-        ];
-
-        fs.writeFile(productsPath, JSON.stringify(updatedProducts), (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
-      } else {
-        this.id = nanoid();
-        products.push(this);
-
-        fs.writeFile(productsPath, JSON.stringify(products), (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
-      }
-    });
+  updateById(id) {
+    return db.execute(
+      "UPDATE products SET title = ?, imageUrl = ?, description = ? , price = ? WHERE products.id = ?",
+      [this.title, this.imageUrl, this.description, this.price, id]
+    );
   }
 
   static deleteById(id) {
-    getProducts((products) => {
-      const product = products.find((product) => product.id === id);
-      const updatedProducts = products.filter((product) => product.id !== id);
-
-      fs.writeFile(productsPath, JSON.stringify(updatedProducts), (err) => {
-        if (!err) {
-          Cart.deleteProduct(id, product.price);
-        }
-      });
-    });
+    return db.execute("DELETE FROM products WHERE products.id = ?", [id]);
   }
 
-  static fetchAll(callback) {
-    getProducts(callback);
+  static fetchAll() {
+    return db.execute("SELECT * FROM products");
   }
 
-  static findById(id, callback) {
-    getProducts((products) => {
-      const product = products.find((product) => product.id === id);
-      callback(product);
-    });
+  static findById(id) {
+    return db.execute("SELECT * FROM products WHERE products.id = ?", [id]);
   }
 };
