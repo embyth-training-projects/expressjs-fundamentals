@@ -3,7 +3,7 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const { mongoConnect } = require("./helpers/database");
+const mongooseConnect = require("./helpers/database");
 
 const userController = require("./controllers/user");
 
@@ -25,4 +25,6 @@ app.use(shopRoutes);
 app.use("/admin", adminRoutes);
 app.use(utilityRoutes);
 
-mongoConnect(() => app.listen(3000));
+mongooseConnect()
+  .then(() => app.listen(3000))
+  .catch((err) => console.error(err));

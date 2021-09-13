@@ -1,25 +1,8 @@
-const { MongoClient } = require("mongodb");
+const { connect } = require("mongoose");
 
-let _db;
+const mongooseConnect = (callback) =>
+  connect(
+    "mongodb+srv://rostyslav:Ru55FrCJFUqlWgfP@cluster0.jidn5.mongodb.net/shop-mongoose?retryWrites=true&w=majority"
+  );
 
-const mongoConnect = (callback) => {
-  MongoClient.connect(
-    "mongodb+srv://rostyslav:Ru55FrCJFUqlWgfP@cluster0.jidn5.mongodb.net/shop?retryWrites=true&w=majority"
-  )
-    .then((client) => {
-      console.log(`Connected to the database!`);
-      _db = client.db();
-      callback();
-    })
-    .catch((err) => console.error(err));
-};
-
-const getDatabase = () => {
-  if (_db) {
-    return _db;
-  }
-
-  throw new Error("No database was found!");
-};
-
-module.exports = { mongoConnect, getDatabase };
+module.exports = mongooseConnect;

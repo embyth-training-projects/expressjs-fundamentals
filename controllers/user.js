@@ -1,9 +1,9 @@
 const User = require("../models/user");
 
 exports.getDummyUser = (req, res, next) => {
-  User.findById("613f5b492634ee7e145cff1c")
-    .then(({ _id, name, email, cart }) => {
-      req.user = new User(name, email, cart, _id);
+  User.findById("613f8ccc7a8c3218f9322292")
+    .then((user) => {
+      req.user = user;
       next();
     })
     .catch((err) => console.error(err));

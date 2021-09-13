@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render("admin/products", {
         prods: products,
@@ -23,7 +23,14 @@ exports.getAddProduct = (req, res, next) => {
 exports.postAddProduct = (req, res, next) => {
   const { title, imageUrl, price, description } = req.body;
 
-  const product = new Product(title, price, description, imageUrl);
+  const product = new Product({
+    title,
+    price,
+    description,
+    imageUrl,
+    userId: req.user._id,
+  });
+
   product
     .save()
     .then(() => res.redirect("/admin/products"))
@@ -58,10 +65,14 @@ exports.getEditProduct = (req, res, next) => {
 exports.postEditProduct = (req, res, next) => {
   const { productId, title, imageUrl, description, price } = req.body;
 
-  const product = new Product(title, price, description, imageUrl);
-
-  product
-    .update(productId)
+  Product.findById(productId)
+    .then((product) => {
+      product.title = title;
+      product.imageUrl = imageUrl;
+      product.description = description;
+      product.price = price;
+      return product.save();
+    })
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.error(err));
 };
@@ -69,7 +80,7 @@ exports.postEditProduct = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
   const productId = req.body.productId;
 
-  Product.deleteById(productId)
+  Product.findByIdAndRemove(productId)
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.error(err));
 };
