@@ -1,8 +1,5 @@
 const { connect } = require("mongoose");
 
-const mongooseConnect = (callback) =>
-  connect(
-    "mongodb+srv://rostyslav:Ru55FrCJFUqlWgfP@cluster0.jidn5.mongodb.net/shop-mongoose?retryWrites=true&w=majority"
-  );
+const mongooseConnect = (dbUri) => connect(dbUri);
 
 module.exports = mongooseConnect;
