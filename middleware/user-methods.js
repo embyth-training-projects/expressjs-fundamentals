@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-exports.getDummyUser = (req, res, next) => {
+module.exports = (req, res, next) => {
   if (!req.session.user) {
     return next();
   }

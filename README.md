@@ -1,11 +1,11 @@
 # Assignment
 
-1. Create login form
+1. Add signin functionality
 
-2. Initialize the Session middleware
+2. Encrypt password
 
-3. Use MongoDb to store sessions
+3. Protect admin routes
 
-4. Create logout form
+4. Add CSRF protection
 
-5. Manipulate the view based on session
+5. Provide use feedback

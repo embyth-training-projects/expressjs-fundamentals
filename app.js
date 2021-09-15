@@ -4,11 +4,14 @@ const express = require("express");
 const session = require("express-session");
 const MongoDBStrore = require("connect-mongodb-session")(session);
 const bodyParser = require("body-parser");
+const csrf = require("csurf");
+const flash = require("connect-flash");
 
 const mongooseConnect = require("./helpers/database");
 const { DB_URI, COOKIE_SECRET } = require("./helpers/const");
 
-const userController = require("./controllers/user");
+const insertUserMethods = require("./middleware/user-methods");
+const insertLocalsProps = require("./middleware/locals-props");
 
 const shopRoutes = require("./routes/shop");
 const adminRoutes = require("./routes/admin");
@@ -18,6 +21,9 @@ const utilityRoutes = require("./routes/utils");
 const app = express();
 
 const sessionStore = new MongoDBStrore({ uri: DB_URI, collection: "sessions" });
+
+const csrfProtection = csrf();
+
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -31,8 +37,11 @@ app.use(
     store: sessionStore,
   })
 );
+app.use(csrfProtection);
+app.use(flash());
 
-app.use(userController.getDummyUser);
+app.use(insertLocalsProps);
+app.use(insertUserMethods);
 
 app.use(shopRoutes);
 app.use("/admin", adminRoutes);
