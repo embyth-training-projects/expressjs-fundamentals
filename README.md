@@ -1,11 +1,7 @@
 # Assignment
 
-1. Add signin functionality
+1. Install nodemailer
 
-2. Encrypt password
+2. Connect nodemailer to email delivery service (SendGrid)
 
-3. Protect admin routes
-
-4. Add CSRF protection
-
-5. Provide use feedback
+3. Config mailer transport
