@@ -2,7 +2,7 @@ const path = require("path");
 
 const express = require("express");
 const session = require("express-session");
-const MongoDBStrore = require("connect-mongodb-session")(session);
+const MongoDBStore = require("connect-mongodb-session")(session);
 const bodyParser = require("body-parser");
 const csrf = require("csurf");
 const flash = require("connect-flash");
@@ -20,7 +20,7 @@ const utilityRoutes = require("./routes/utils");
 
 const app = express();
 
-const sessionStore = new MongoDBStrore({ uri: DB_URI, collection: "sessions" });
+const sessionStore = new MongoDBStore({ uri: DB_URI, collection: "sessions" });
 
 const csrfProtection = csrf();
 
