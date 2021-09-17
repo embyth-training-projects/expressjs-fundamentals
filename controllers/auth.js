@@ -91,7 +91,11 @@ exports.postLogin = (req, res, next) => {
         })
         .catch((err) => console.error(err));
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.getSignup = (req, res, next) => {
@@ -198,7 +202,11 @@ exports.postReset = (req, res, next) => {
           });
         });
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(err);
+      });
   });
 };
 
@@ -223,11 +231,16 @@ exports.getNewPassword = (req, res, next) => {
         passwordToken: token,
       });
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.postNewPassword = (req, res, next) => {
   const { password, userId, passwordToken } = req.body;
+  let resetUser;
 
   User.findOne({
     resetToken: passwordToken,
@@ -235,16 +248,19 @@ exports.postNewPassword = (req, res, next) => {
     _id: userId,
   })
     .then((user) => {
-      return bcrypt
-        .hash(password, 12)
-        .then((hashedPassword) => {
-          user.password = hashedPassword;
-          user.resetToken = undefined;
-          user.resetTokenExpiration = undefined;
-          return user.save();
-        })
-        .catch((err) => console.error(err));
+      resetUser = user;
+      return bcrypt.hash(password, 12);
+    })
+    .then((hashedPassword) => {
+      resetUser.password = hashedPassword;
+      resetUser.resetToken = undefined;
+      resetUser.resetTokenExpiration = undefined;
+      return resetUser.save();
     })
     .then(() => res.redirect("/login"))
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };

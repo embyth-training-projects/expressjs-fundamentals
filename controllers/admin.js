@@ -11,7 +11,11 @@ exports.getProducts = (req, res, next) => {
         path: "/admin/products",
       });
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.getAddProduct = (req, res, next) => {
@@ -63,7 +67,11 @@ exports.postAddProduct = (req, res, next) => {
   product
     .save()
     .then(() => res.redirect("/admin/products"))
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
@@ -91,7 +99,11 @@ exports.getEditProduct = (req, res, next) => {
         validationErrors: [],
       });
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -128,7 +140,11 @@ exports.postEditProduct = (req, res, next) => {
       product.price = price;
       return product.save().then(() => res.redirect("/admin/products"));
     })
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -136,5 +152,9 @@ exports.postDeleteProduct = (req, res, next) => {
 
   Product.deleteOne({ _id: productId, userId: req.user._id })
     .then(() => res.redirect("/admin/products"))
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 };

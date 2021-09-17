@@ -41,7 +41,11 @@ productSchema.pre("deleteOne", { document: false, query: true }, function () {
         return user.save();
       })
     )
-    .catch((err) => console.error(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(err);
+    });
 });
 
 module.exports = model("Product", productSchema);

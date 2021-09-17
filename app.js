@@ -48,6 +48,11 @@ app.use("/admin", adminRoutes);
 app.use(authRoutes);
 app.use(utilityRoutes);
 
+app.use((error, req, res, next) => {
+  // res.status(error.httpStatusCode).render(...);
+  res.redirect("/500");
+});
+
 mongooseConnect(DB_URI)
   .then(() => app.listen(3000))
   .catch((err) => console.error(err));
