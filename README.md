@@ -1,7 +1,7 @@
 # Assignment
 
-1. Install nodemailer
+1. Install express-validator package
 
-2. Connect nodemailer to email delivery service (SendGrid)
+2. Use validation on login and signup user inputs
 
-3. Config mailer transport
+3. Use validation on add/edit product user inputs
