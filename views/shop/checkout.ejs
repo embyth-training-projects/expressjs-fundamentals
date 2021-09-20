@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../includes/head.ejs', {hasProductCss: false, hasFormsCss: false}) %>
+
+<body>
+  <%- include('../includes/navigation.ejs') %>
+
+  <main>
+    <ul class="cart__item-list">
+      <% products.forEach(p => { %>
+      <li class="cart__item">
+        <h1><%= p.product.title %></h1>
+        <h2>Quantity: <%= p.quantity %></h2>
+      </li>
+      <% }) %>
+    </ul>
+    <div class="centered">
+      <h2>Total Price: $<%= totalPrice %></h2>
+    </div>
+    <div class="centered">
+      <form action="/create-checkout-session" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button id="order-btn" class="btn" type="submit">Proceed to Payment!</button>
+      </form>
+    </div>
+  </main>
+</body>
+
+</html>

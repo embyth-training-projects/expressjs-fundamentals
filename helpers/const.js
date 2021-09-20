@@ -7,3 +7,5 @@ module.exports.DB_URI = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.
 module.exports.COOKIE_SECRET = process.env.COOKIE_SECRET;
 
 module.exports.SENDGRID_API_KEY = process.env.SEND_GRID_API_KEY;
+
+module.exports.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;

@@ -1,7 +1,10 @@
 const path = require("path");
 const fs = require("fs");
 
+const { STRIPE_SECRET_KEY } = require("../helpers/const");
+
 const PDFDocument = require("pdfkit");
+const stripe = require("stripe")(STRIPE_SECRET_KEY);
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -206,7 +209,7 @@ exports.getInvoice = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-exports.postOrder = (req, res, next) => {
+exports.getCheckoutSuccess = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
     .then((user) => {
@@ -230,6 +233,64 @@ exports.postOrder = (req, res, next) => {
     .catch((err) => {
       const error = new Error(err);
       error.httpStatusCode = 500;
-      return next(err);
+      return next(error);
+    });
+};
+
+exports.getCheckout = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items.map((item) => ({
+        quantity: item.quantity,
+        product: { ...item.productId._doc },
+      }));
+      const totalPrice = products.reduce(
+        (acc, item) => acc + item.product.price,
+        0
+      );
+
+      return res.render("shop/checkout", {
+        path: "/checkout",
+        pageTitle: "Checkout",
+        products,
+        totalPrice,
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+
+exports.postCreateCheckoutSession = (req, res, next) => {
+  req.user
+    .populate("cart.items.productId")
+    .then((user) => {
+      const products = user.cart.items.map((item) => ({
+        quantity: item.quantity,
+        product: { ...item.productId._doc },
+      }));
+
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map((item) => ({
+          name: item.product.title,
+          description: item.product.description,
+          amount: item.product.price * 100,
+          currency: "usd",
+          quantity: item.quantity,
+        })),
+        mode: "payment",
+        success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+        cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`,
+      });
+    })
+    .then((session) => res.status(303).redirect(session.url))
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };

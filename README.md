@@ -1,3 +1,5 @@
 # Assignment
 
-1. Add async DELETE request for product deletion from admin products page
+1. Add checkout page
+
+2. Add payment using Stripe
