@@ -12,6 +12,7 @@ const { DB_URI, COOKIE_SECRET } = require("./helpers/const");
 
 const insertUserMethods = require("./middleware/user-methods");
 const insertLocalsProps = require("./middleware/locals-props");
+const fileParser = require("./middleware/file-parser");
 
 const shopRoutes = require("./routes/shop");
 const adminRoutes = require("./routes/admin");
@@ -28,7 +29,9 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(fileParser);
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(
   session({
     secret: COOKIE_SECRET,

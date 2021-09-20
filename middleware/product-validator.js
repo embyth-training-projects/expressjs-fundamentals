@@ -6,7 +6,6 @@ exports.addProduct = [
     .isLength({ min: 4 })
     .withMessage("Title should be at least 4 charecters long")
     .trim(),
-  body("imageUrl").isURL().withMessage("Image url should be a valid url"),
   body("price")
     .isFloat()
     .withMessage("Product price should be a decimal number"),
