@@ -1,67 +1,17 @@
-const path = require("path");
-
 const express = require("express");
-const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session);
 const bodyParser = require("body-parser");
-const csrf = require("csurf");
-const flash = require("connect-flash");
 
-const mongooseConnect = require("./helpers/database");
-const { DB_URI, COOKIE_SECRET } = require("./helpers/const");
+const setCorsHeaders = require("./middlewares/cors-headers");
 
-const insertUserMethods = require("./middleware/user-methods");
-const insertLocalsProps = require("./middleware/locals-props");
-const fileParser = require("./middleware/file-parser");
-
-const shopRoutes = require("./routes/shop");
-const adminRoutes = require("./routes/admin");
-const authRoutes = require("./routes/auth");
-const utilityRoutes = require("./routes/utils");
+const feedRoutes = require("./routes/feed");
 
 const app = express();
 
-const sessionStore = new MongoDBStore({ uri: DB_URI, collection: "sessions" });
+// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
+app.use(bodyParser.json()); // application/json
 
-const csrfProtection = csrf();
+app.use(setCorsHeaders);
 
-app.set("view engine", "ejs");
-app.set("views", "views");
+app.use("/feed", feedRoutes);
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(fileParser);
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/images", express.static(path.join(__dirname, "images")));
-app.use(
-  session({
-    secret: COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: sessionStore,
-  })
-);
-app.use(csrfProtection);
-app.use(flash());
-
-app.use(insertLocalsProps);
-app.use(insertUserMethods);
-
-app.use(shopRoutes);
-app.use("/admin", adminRoutes);
-app.use(authRoutes);
-app.use(utilityRoutes);
-
-app.use((error, req, res, next) => {
-  // res.status(error.httpStatusCode).render(...);
-  // res.redirect("/500");
-
-  res.status(500).render("500", {
-    pageTitle: "Error!",
-    path: "/500",
-    isAuthenticated: req.session.isLoggedIn,
-  });
-});
-
-mongooseConnect(DB_URI)
-  .then(() => app.listen(3000))
-  .catch((err) => console.error(err));
+app.listen(8080);
