@@ -8,6 +8,8 @@ const setCorsHeaders = require("./middlewares/cors-headers");
 const fileParser = require("./middlewares/file-parser");
 const errorHandler = require("./middlewares/error-handler");
 
+const socket = require("./socket");
+
 const { DB_URI } = require("./helpers/const");
 
 const feedRoutes = require("./routes/feed");
@@ -29,5 +31,11 @@ app.use(errorHandler);
 
 mongoose
   .connect(DB_URI)
-  .then(() => app.listen(8080))
+  .then(() => {
+    const server = app.listen(8080);
+    const io = socket.init(server);
+    io.on("connection", (socket) => {
+      console.log(`Client connected!`);
+    });
+  })
   .catch((err) => console.error(err));
