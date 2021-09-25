@@ -9,6 +9,7 @@ const fileParser = require("./middlewares/file-parser");
 const errorHandler = require("./middlewares/error-handler");
 
 const socket = require("./socket");
+const telegramBot = require("./bot");
 
 const { DB_URI } = require("./helpers/const");
 
@@ -37,5 +38,7 @@ mongoose
     io.on("connection", (socket) => {
       console.log(`Client connected!`);
     });
+
+    telegramBot.init();
   })
   .catch((err) => console.error(err));

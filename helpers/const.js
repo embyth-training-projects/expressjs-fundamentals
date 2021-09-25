@@ -8,4 +8,6 @@ module.exports.JWT_SECRET = process.env.JWT_SECRET;
 
 module.exports.JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 
+module.exports.TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_KEY;
+
 module.exports.POSTS_PER_PAGE = 2;

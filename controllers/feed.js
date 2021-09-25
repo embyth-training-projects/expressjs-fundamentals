@@ -2,8 +2,10 @@ const { validationResult } = require("express-validator");
 
 const Post = require("../models/post");
 const User = require("../models/user");
+const BotUser = require("../models/bot-user");
 
 const socket = require("../socket");
+const telegramBot = require("../bot");
 
 const { deleteImage } = require("../helpers/utils");
 const { POSTS_PER_PAGE } = require("../helpers/const");
@@ -77,6 +79,17 @@ exports.createPost = (req, res, next) => {
         action: "create",
         post: { ...post._doc, creator: { _id: creatorId, name: creatorName } },
       });
+    })
+    .then(() => BotUser.find())
+    .then((botUsers) => {
+      const bot = telegramBot.getBot();
+
+      botUsers.map((user) =>
+        bot.sendMessage(
+          user.chatId,
+          `New Product has been created! Title: ${title}, Content: ${content}, Creator: ${creatorName}`
+        )
+      );
     })
     .then(() =>
       res.status(201).json({
