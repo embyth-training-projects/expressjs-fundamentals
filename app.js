@@ -7,14 +7,13 @@ const mongoose = require("mongoose");
 const setCorsHeaders = require("./middlewares/cors-headers");
 const fileParser = require("./middlewares/file-parser");
 const errorHandler = require("./middlewares/error-handler");
+const isAuth = require("./middlewares/is-auth");
+const graphqlServer = require("./middlewares/graphql-server");
+const fileHandler = require("./middlewares/file-handler");
 
-const socket = require("./socket");
 const telegramBot = require("./bot");
 
 const { DB_URI } = require("./helpers/const");
-
-const feedRoutes = require("./routes/feed");
-const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -25,20 +24,18 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(setCorsHeaders);
 
-app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
+app.use(isAuth);
+
+app.put("/post-image", fileHandler);
+
+app.use("/graphql", graphqlServer);
 
 app.use(errorHandler);
 
 mongoose
   .connect(DB_URI)
   .then(() => {
-    const server = app.listen(8080);
-    const io = socket.init(server);
-    io.on("connection", (socket) => {
-      console.log(`Client connected!`);
-    });
-
+    app.listen(8080);
     telegramBot.init();
   })
   .catch((err) => console.error(err));

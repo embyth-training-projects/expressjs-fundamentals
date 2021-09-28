@@ -5,5 +5,11 @@ module.exports = (req, res, next) => {
     "OPTIONS, GET, POST, PATCH, PUT, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  // Statement for GraphQL to handle OPTIONS method without error
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
   next();
 };
